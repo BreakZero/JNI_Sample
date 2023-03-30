@@ -14,12 +14,12 @@ private:
     char* name;
 
 public:
-    char* getName() {
-        char buff[1024];
-        memset(buff, 0, sizeof(buff));
-        strcpy(buff, "Hello, ");
-        strcat(buff, name);
-        return buff;
+    char* sayHi() {
+        char result[1024];
+        memset(result, 0, sizeof(result));
+        strcpy(result, "Hello, ");
+        strcat(result, name);
+        return result;
     }
     Student(char *name) {
         LOGI("调用构造函数");
@@ -48,7 +48,7 @@ Java_com_easy_jni_1sample_MainActivity_updateName(JNIEnv *env, jobject thiz) {
     jfieldID nameField = env->GetFieldID(mainCls, "name", "Ljava/lang/String;");
     Student* student = new Student("Dougie");
     // void SetObjectField(jobject obj, jfieldID fieldID, jobject value)
-    env->SetObjectField(thiz, nameField, env->NewStringUTF(student->getName()));
+    env->SetObjectField(thiz, nameField, env->NewStringUTF(student->sayHi()));
     delete student;
     return env->NewStringUTF("hello world");
 }
