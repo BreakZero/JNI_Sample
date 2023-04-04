@@ -11,16 +11,17 @@
 
 class Student {
 private:
-    char* name;
+    char *name;
 
 public:
-    char* sayHi() {
+    char *sayHi() {
         char result[1024];
         memset(result, 0, sizeof(result));
         strcpy(result, "Hello, ");
         strcat(result, name);
         return result;
     }
+
     Student(char *name) {
         LOGI("调用构造函数");
         this->name = name;
@@ -31,8 +32,9 @@ public:
     };
 };
 
+
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_easy_jni_1sample_MainActivity_stringFromJNI(
+get_name_from_jni(
         JNIEnv *env,
         jobject /* this */) {
     MD5 md5;
@@ -41,14 +43,35 @@ Java_com_easy_jni_1sample_MainActivity_stringFromJNI(
     return result;
 }
 extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_easy_jni_1sample_MainActivity_updateName(JNIEnv *env, jobject thiz) {
+JNIEXPORT void JNICALL
+update_name(JNIEnv *env, jobject thiz) {
     jclass mainCls = env->GetObjectClass(thiz);
     // jfieldID GetFieldID(jclass clazz, const char* name, const char* sig)
     jfieldID nameField = env->GetFieldID(mainCls, "name", "Ljava/lang/String;");
-    Student* student = new Student("Dougie");
+    Student *student = new Student("Dougie");
     // void SetObjectField(jobject obj, jfieldID fieldID, jobject value)
     env->SetObjectField(thiz, nameField, env->NewStringUTF(student->sayHi()));
     delete student;
-    return env->NewStringUTF("hello world");
 }
+
+static JNINativeMethod methods[] = {
+        {"getStringFromJNI", "()Ljava/lang/String;", (void *) get_name_from_jni},
+        {"updateName",    "()V",                  (void *) update_name}
+};
+
+JNIEXPORT jint JNICALL
+JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env = nullptr;
+    if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        return -1;
+    }
+    const char *className = "com/easy/jni_sample/MainActivity";
+    jclass clazz = env->FindClass(className);
+    if (clazz == nullptr) {
+        return -1;
+    }
+    if (env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(methods[0])) < 0) {
+        return -1;
+    }
+    return JNI_VERSION_1_6;
+};

@@ -21,23 +21,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnUpdate.setOnClickListener {
-            updateName().also {
-                Log.d("=====", it)
-            }
+            updateName()
             binding.sampleText.text = name
         }
 
         // Example of a call to a native method
-        binding.sampleText.text = stringFromJNI()
+        binding.sampleText.text = getStringFromJNI()
     }
 
     /**
      * A native method that is implemented by the 'jni_sample' native library,
      * which is packaged with this application.
      */
-    external fun stringFromJNI(): String
+    external fun getStringFromJNI(): String
 
-    external fun updateName(): String
+    external fun updateName()
 
     companion object {
         // Used to load the 'jni_sample' library on application startup.
